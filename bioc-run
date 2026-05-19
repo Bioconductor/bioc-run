@@ -204,7 +204,7 @@ if [ -n "$resetchown" ]; then
         -e USERID=$USERID \
         -e GROUPID=$GROUPID \
         -u root \
-        $ENV_FILE_FLAGS \
+        "${env_file_flags[@]}" \
         $biocdocker \
         bash -c 'chown -R $USERID:$GROUPID /home/rstudio /usr/local/lib/R/host-site-library'
         exit
@@ -227,7 +227,7 @@ docker run --rm \
       -v $DOCKER_HOME:/home/rstudio \
       -v $DOCKER_RPKGS:/usr/local/lib/R/host-site-library \
       -u root \
-      $ENV_FILE_FLAGS \
+      "${env_file_flags[@]}" \
       $biocdocker \
       bash -c 'chown -R $USERID:1000 /home/rstudio /usr/local/lib/R/host-site-library'
 
@@ -243,7 +243,7 @@ if [ "$envtype" == "rstudio" ]; then
         -v $DOCKER_RPKGS:/usr/local/lib/R/host-site-library \
         -e USERID=$UID \
         -p $port:8787 \
-        $ENV_FILE_FLAGS \
+        "${env_file_flags[@]}" \
         $biocdocker \
         bash -c '/init'
 elif [ "$envtype" == "bash" ]; then
@@ -255,7 +255,7 @@ elif [ "$envtype" == "bash" ]; then
             -v $DOCKER_RPKGS:/usr/local/lib/R/host-site-library \
             -v "$(pwd)":/workspace \
             -w /workspace \
-            $ENV_FILE_FLAGS \
+            "${env_file_flags[@]}" \
             $biocdocker bash "$@"
     else
         docker run $DOCKER_IT_FLAGS --user rstudio \
@@ -263,7 +263,7 @@ elif [ "$envtype" == "bash" ]; then
             -v $DOCKER_RPKGS:/usr/local/lib/R/host-site-library \
             -v "$(pwd)":/workspace \
             -w /workspace \
-            $ENV_FILE_FLAGS \
+            "${env_file_flags[@]}" \
             $biocdocker bash "$@"
     fi
 elif [ "$envtype" == "R" ]; then
@@ -275,7 +275,7 @@ elif [ "$envtype" == "R" ]; then
             -v $DOCKER_RPKGS:/usr/local/lib/R/host-site-library \
             -v "$(pwd)":/workspace \
             -w /workspace \
-            $ENV_FILE_FLAGS \
+            "${env_file_flags[@]}" \
             $biocdocker R "$@"
     else
         docker run $DOCKER_IT_FLAGS --user rstudio \
@@ -283,7 +283,7 @@ elif [ "$envtype" == "R" ]; then
             -v $DOCKER_RPKGS:/usr/local/lib/R/host-site-library \
             -v "$(pwd)":/workspace \
             -w /workspace \
-            $ENV_FILE_FLAGS \
+            "${env_file_flags[@]}" \
             $biocdocker R "$@"
     fi
 elif [ "$envtype" == "Rscript" ]; then
@@ -295,7 +295,7 @@ elif [ "$envtype" == "Rscript" ]; then
             -v $DOCKER_RPKGS:/usr/local/lib/R/host-site-library \
             -v "$(pwd)":/workspace \
             -w /workspace \
-            $ENV_FILE_FLAGS \
+            "${env_file_flags[@]}" \
             $biocdocker Rscript "$@"
     else
         docker run $DOCKER_IT_FLAGS --user rstudio \
@@ -303,7 +303,7 @@ elif [ "$envtype" == "Rscript" ]; then
             -v $DOCKER_RPKGS:/usr/local/lib/R/host-site-library \
             -v "$(pwd)":/workspace \
             -w /workspace \
-            $ENV_FILE_FLAGS \
+            "${env_file_flags[@]}" \
             $biocdocker Rscript "$@"
     fi
 fi
