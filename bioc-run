@@ -192,6 +192,33 @@ copy_config() {
 
 copy_config .Rprofile .gitconfig .inputrc
 
+# RStudio saves a suspended session's environment variables (e.g.,
+# BIOCONDUCTOR_NAME, BIOCONDUCTOR_DOCKER_VERSION) in the shared home directory
+# and restores them on resume, even in a container from a different image.
+# Discard suspended session state when the image differs from the last one
+# used for RStudio with this home directory.
+clear_stale_rstudio_session() {
+    local image_id marker last_id
+    image_id=$(docker image inspect --format '{{.Id}}' "$biocdocker" 2>/dev/null)
+    [ -n "$image_id" ] || return 0
+    marker="$DOCKER_HOME/.bioc-run-rstudio-image"
+    last_id=$(cat "$marker" 2>/dev/null)
+    if [ "$last_id" != "$image_id" ]; then
+        local sessions="$DOCKER_HOME/.local/share/rstudio/sessions/active"
+        if compgen -G "$sessions/*/suspended-session-data" >/dev/null; then
+            if [ "$quiet" = false ]; then
+                echo "Image changed since last RStudio session; discarding suspended session state."
+            fi
+            rm -rf "$sessions"/*/suspended-session-data
+        fi
+        echo "$image_id" > "$marker"
+    fi
+}
+
+if [ "$envtype" == "rstudio" ] && [ -z "$resetchown" ]; then
+    clear_stale_rstudio_session
+fi
+
 if [ -n "$resetchown" ]; then
     IFS=':' read USERID GROUPID <<<$(grep "^$(whoami):" /etc/passwd | cut -d':' -f3,4)
     echo ""

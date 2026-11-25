@@ -96,6 +96,15 @@ This allows R packages installed in the container to be persisted on the host ma
 Use <kbd>Ctrl</kbd> + <kbd>C</kbd> (<kbd>⌘ Command</kbd> + <kbd>C</kbd> on OSX)
 to stop the `RStudio` server.
 
+The home directory (`-d`) is shared across versions. `RStudio` saves the
+environment variables of a suspended session there (including
+`BIOCONDUCTOR_NAME` and `BIOCONDUCTOR_DOCKER_VERSION`) and restores them when
+the session resumes. To avoid carrying these into a different image,
+`bioc-run` records the image last used for `RStudio` in
+`<dockerhome>/.bioc-run-rstudio-image` and discards suspended session state
+when the image changes, for example when switching versions or after pulling an
+updated image. Saved files and settings are not affected.
+
 ## Passing Environment Variables
 
 The `-f` flag allows you to pass environment variables from files to the Docker
